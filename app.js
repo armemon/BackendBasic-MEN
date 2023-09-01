@@ -21,3 +21,9 @@ app.use(cors())
 
 app.use('/api/v1', User); // Define your API route prefix
 // app.use('/api/v1', datasetsRouter); // Define your API route prefix
+
+
+app.get("/", (req, res) => {
+    res.send(`Server is Working`)
+    res.send(`You can see my portfolio at https://armemon.netlify.app/`)
+})
