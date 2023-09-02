@@ -13,10 +13,11 @@ config({
   path: './config/config.env', // load this file, if it exists
 })
 
+          
 cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_SECRET
+  cloud_name: 'dxcijzrex', 
+  api_key: '892676688774548', 
+  api_secret: 'xc-9ZbDZE9W9TMI7hq3IC651om8' 
 });
   
 connectDatbase();
