@@ -28,7 +28,7 @@ export const register = async (req, res) => {
     
     if (avatar) {
       const mycloud = await cloudinary.uploader.upload(avatar, {
-        folder: "IEEE_PES"
+        folder: "IEEEPES"
       });
     
       fs.rmSync("./tmp", { recursive: true });
@@ -213,7 +213,7 @@ export const updateProfile = async (req, res) => {
       await cloudinary.v2.uploader.destroy(user.avatar.public_id);
 
       const mycloud = await cloudinary.uploader.upload(avatar, {
-        folder: "IEEE_PES"
+        folder: "IEEEPES"
       });
       fs.rmSync("./tmp", { recursive: true });
 
