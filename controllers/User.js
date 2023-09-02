@@ -25,12 +25,16 @@ export const register = async (req, res) => {
       unique_filename: false,
       overwrite: true,
     };
+    let mycloud = {
+      public_id: "",
+      secure_url:"",
+    }
     
     if (avatar) {
-      const mycloud = await cloudinary.uploader.upload(avatar, {
+      mycloud = await cloudinary.uploader.upload(avatar, {
         folder: "IEEEPES"
       });
-    
+    console.log(mycloud)
       fs.rmSync("./tmp", { recursive: true });
     }
     user = await User.create({
@@ -38,8 +42,8 @@ export const register = async (req, res) => {
       email,
       password,
       avatar: {
-        public_id: avatar ? mycloud.public_id : "",
-        url: avatar ? mycloud.secure_url : "",
+        public_id: mycloud.public_id,
+        url: mycloud.secure_url,
       },
       otp,
       otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
