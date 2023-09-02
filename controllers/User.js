@@ -38,8 +38,8 @@ export const register = async (req, res) => {
       email,
       password,
       avatar: {
-        public_id: avatar? mycloud.public_id : "",
-        url: avatar? mycloud.secure_url :"",
+        public_id: avatar ? mycloud.public_id : "",
+        url: avatar ? mycloud.secure_url : "",
       },
       otp,
       otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
