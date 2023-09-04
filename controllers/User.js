@@ -336,7 +336,7 @@ export const getDomainDataset = async (req, res) => {
   try {
     const domainDataset = await DomainDataset.findOne();
 
-    res.status(200).json({success: true, meetingDataset: domainDataset});
+    res.status(200).json({success: true, domainDataset: domainDataset});
   } catch (error) {
     res.status(500).json({success: false, message: error.message});
   }
