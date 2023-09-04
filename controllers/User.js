@@ -325,7 +325,7 @@ export const getMeetingDataset = async (req, res) => {
   try {
     // const user = await User.findById(req.user._id);
 
-    const meetingDataset = await MeetingDataset.findOne();
+    const meetingDataset = await MeetingDataset.findOne().sort({_id: -1});
 
     res.status(200).json({success: true, meetingDataset: meetingDataset});
   } catch (error) {
@@ -334,7 +334,7 @@ export const getMeetingDataset = async (req, res) => {
 };
 export const getDomainDataset = async (req, res) => {
   try {
-    const domainDataset = await DomainDataset.findOne();
+    const domainDataset = await DomainDataset.findOne().sort({_id: -1});
 
     res.status(200).json({success: true, domainDataset: domainDataset});
   } catch (error) {
@@ -369,7 +369,7 @@ export const editMeeting = async (req, res) => {
       editedMemberIndex,
     } = req.body;
 
-    const meetingDataset = await MeetingDataset.findOne();
+    const meetingDataset = await MeetingDataset.findOne().sort({_id: -1});
 
     console.log(meetingDataset[selectedDataset][selectedMeetingIndex]);
 
