@@ -18,6 +18,9 @@ import {
   getDomainDataset,
   addDomainMember,
   editMeeting,
+  addMeeting,
+  ShiftMember,
+  DeleteMember,
 } from '../controllers/User.js';
 import {isAuthenticated} from '../middleware/auth.js';
 
@@ -46,18 +49,17 @@ router.route('/updatepassword').put(isAuthenticated, updatePassword);
 router.route('/forgetpassword').post(forgetPassword);
 router.route('/resetpassword').put(resetPassword);
 
-
 router.route('/getDomainDataset').get(isAuthenticated, getDomainDataset);
 router.route('/getMeetingDataset').get(isAuthenticated, getMeetingDataset);
 
-
 router.route('/addDomainMember').post(isAuthenticated, addDomainMember);
 router.route('/editMeeting').post(isAuthenticated, editMeeting);
-
+router.route('/addMeeting').post(isAuthenticated, addMeeting);
+router.route('/ShiftMember').post(isAuthenticated, ShiftMember);
+router.route('/DeleteMember').post(isAuthenticated, DeleteMember);
 
 router.route('/resetDomainDataset').get(isAuthenticated, resetDomainDataset);
 router.route('/resetMeetingDataset').get(isAuthenticated, resetMeetingDataset);
-
 
 // // Route to get datasets
 // router.get('/datasets', async (req, res) => {
