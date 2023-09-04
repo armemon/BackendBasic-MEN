@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
     minlength: [8, 'Password must be at least 8 characters long'],
     select: false,
   },
+  domain: {
+    type: String,
+    required: true,
+  },
   avatar: {
     public_id: String,
     url: String,
@@ -64,84 +68,6 @@ userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });   //delete account if otp expiry 
+// userSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });   //delete account if otp expiry 
 
 export const User = mongoose.model('User', userSchema);
-
-export const logout = async (req, res) => {
-  try {
-    res
-      .status(200)
-      .cookie("token", null, {
-        expires: new Date(Date.now()),
-      })
-      .json({ success: true, message: "Logged out successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const addTask = async (req, res) => {
-  try {
-    const { title, description } = req.body;
-
-    const user = await User.findById(req.user._id);
-
-    user.tasks.push({
-      title,
-      description,
-      completed: false,
-      createdAt: new Date(Date.now()),
-    });
-
-    await user.save();
-
-    res.status(200).json({ success: true, message: "Task added successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const removeTask = async (req, res) => {
-  try {
-    const { taskId } = req.params;
-
-    const user = await User.findById(req.user._id);
-
-    user.tasks = user.tasks.filter(
-      (task) => task._id.toString() !== taskId.toString()
-    );
-
-    await user.save();
-
-    res
-      .status(200)
-      .json({ success: true, message: "Task removed successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const updateTask = async (req, res) => {
-  try {
-    const { taskId } = req.params;
-
-    const user = await User.findById(req.user._id);
-
-    user.task = user.tasks.find(
-      (task) => task._id.toString() === taskId.toString()
-    );
-
-    user.task.completed = !user.task.completed;
-
-    await user.save();
-
-    res
-      .status(200)
-      .json({ success: true, message: "Task Updated successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// module.exports = Dataset;

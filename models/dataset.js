@@ -1,20 +1,30 @@
 // models/Dataset.js
 import mongoose from 'mongoose';
 
-const datasetSchema = new mongoose.Schema({
-  domain: String,
+const meetingSchema = new mongoose.Schema({
   meetingName: String,
-  date: Date,
+  date: String,
   members: [
     {
       name: String,
       present: Boolean,
       reason: String,
-      rating: Number,
+      rating: String,
     },
   ],
 });
 
-export const Dataset = mongoose.model('Dataset', datasetSchema);
+const meetingDatasetSchema = new mongoose.Schema({
+  IT: [meetingSchema],
+  Doc: [meetingSchema],
+  PR: [meetingSchema],
+  RnD: [meetingSchema],
+  EM: [meetingSchema],
+  HR: [meetingSchema],
+  GM: [meetingSchema],
+  MR: [meetingSchema],
+});
+
+export const MeetingDataset = mongoose.model('MeetingDataset', meetingDatasetSchema);
 
 // module.exports = Dataset;

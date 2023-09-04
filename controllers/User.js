@@ -1,18 +1,20 @@
 import {User} from '../models/user.js';
 import {sendMail} from '../utils/sendMail.js';
-import { sendToken } from '../utils/sendToken.js';
-import {v2 as cloudinary} from "cloudinary"
-import fs from "fs"
+import {sendToken} from '../utils/sendToken.js';
+import {v2 as cloudinary} from 'cloudinary';
+import fs from 'fs';
+import {initialDomainDatasets, initialDatasets} from './data.js';
+import {DomainDataset} from '../models/domainDataset.js';
+import {MeetingDataset} from '../models/dataset.js';
 
 export const register = async (req, res) => {
   try {
-    const {name, email, password} = req.body;
-    console.log(name, email, password);
-   
-    const avatar = req.files?.avatar.tempFilePath ?? "";
-    console.log(avatar)
+    const {name, email, domain, password} = req.body;
+
+    const avatar = req.files?.avatar.tempFilePath ?? '';
+
     let user = await User.findOne({email});
-    console.log(name, email, password);
+    // console.log(name, email, password);
     if (user) {
       return res.status(400).json({
         success: false,
@@ -26,16 +28,16 @@ export const register = async (req, res) => {
       overwrite: true,
     };
     let mycloud = {
-      public_id: "",
-      secure_url:"",
-    }
-    
+      public_id: '',
+      secure_url: '',
+    };
+
     if (avatar) {
       mycloud = await cloudinary.uploader.upload(avatar, {
-        folder: "IEEEPES"
+        folder: 'IEEEPES',
       });
-    console.log(mycloud)
-      fs.rmSync("./tmp", { recursive: true });
+      console.log(mycloud);
+      fs.rmSync('./tmp', {recursive: true});
     }
     user = await User.create({
       name,
@@ -49,8 +51,7 @@ export const register = async (req, res) => {
       otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
     });
 
-
-    await sendMail(email, 'Verify your account', `Your OTP is ${otp}`);
+    await sendMail(email, 'Verify your account', `${name}, Your OTP is ${otp}`);
     sendToken(
       res,
       user,
@@ -89,8 +90,7 @@ export const login = async (req, res) => {
   try {
     const {email, password} = req.body;
     console.log(email, password);
-  
- 
+
     if (!email || !password) {
       return res
         .status(400)
@@ -193,15 +193,13 @@ export const updateTask = async (req, res) => {
   }
 };
 
-
-
 export const getMyProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
     sendToken(res, user, 201, `Welcome back ${user.name}`);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({success: false, message: error.message});
   }
 };
 
@@ -209,17 +207,17 @@ export const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    const { name } = req.body;
-    const avatar = req.files?.avatar.tempFilePath ?? "";
+    const {name} = req.body;
+    const avatar = req.files?.avatar.tempFilePath ?? '';
 
     if (name) user.name = name;
     if (avatar) {
       await cloudinary.v2.uploader.destroy(user.avatar.public_id);
 
       const mycloud = await cloudinary.uploader.upload(avatar, {
-        folder: "IEEEPES"
+        folder: 'IEEEPES',
       });
-      fs.rmSync("./tmp", { recursive: true });
+      fs.rmSync('./tmp', {recursive: true});
 
       user.avatar = {
         public_id: mycloud.public_id,
@@ -231,22 +229,22 @@ export const updateProfile = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Profile Updated successfully" });
+      .json({success: true, message: 'Profile Updated successfully'});
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({success: false, message: error.message});
   }
 };
 
 export const updatePassword = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("+password");
+    const user = await User.findById(req.user._id).select('+password');
 
-    const { oldPassword, newPassword } = req.body;
+    const {oldPassword, newPassword} = req.body;
 
     if (!oldPassword || !newPassword) {
       return res
         .status(400)
-        .json({ success: false, message: "Please enter all fields" });
+        .json({success: false, message: 'Please enter all fields'});
     }
 
     const isMatch = await user.comparePassword(oldPassword);
@@ -254,7 +252,7 @@ export const updatePassword = async (req, res) => {
     if (!isMatch) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid Old Password" });
+        .json({success: false, message: 'Invalid Old Password'});
     }
 
     user.password = newPassword;
@@ -263,20 +261,20 @@ export const updatePassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Password Updated successfully" });
+      .json({success: true, message: 'Password Updated successfully'});
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({success: false, message: error.message});
   }
 };
 
 export const forgetPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const {email} = req.body;
 
-    const user = await User.findOne({ email });
-// console.log(email)
+    const user = await User.findOne({email});
+    // console.log(email)
     if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid Email" });
+      return res.status(400).json({success: false, message: 'Invalid Email'});
     }
 
     const otp = Math.floor(Math.random() * 1000000);
@@ -286,29 +284,29 @@ export const forgetPassword = async (req, res) => {
 
     await user.save();
 
-    const message = `Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
+    const message = `${name}, Your OTP for reseting the password is ${otp}. If you did not request for this, please ignore this email.`;
 
-    await sendMail(email, "Request for Reseting Password", message);
+    await sendMail(email, 'Request for Reseting Password', message);
 
-    res.status(200).json({ success: true, message: `OTP sent to ${email}` });
+    res.status(200).json({success: true, message: `OTP sent to ${email}`});
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({success: false, message: error.message});
   }
 };
 
 export const resetPassword = async (req, res) => {
   try {
-    const { otp, newPassword } = req.body;
+    const {otp, newPassword} = req.body;
 
     const user = await User.findOne({
       otp: otp,
-      resetPasswordOtpExpiry: { $gt: Date.now() },
+      resetPasswordOtpExpiry: {$gt: Date.now()},
     });
 
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: "Otp Invalid or has been Expired" });
+        .json({success: false, message: 'Otp Invalid or has been Expired'});
     }
     user.password = newPassword;
     user.otp = null;
@@ -317,8 +315,157 @@ export const resetPassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, message: `Password Changed Successfully` });
+      .json({success: true, message: `Password Changed Successfully`});
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+
+export const getMeetingDataset = async (req, res) => {
+  try {
+    // const user = await User.findById(req.user._id);
+
+    const meetingDataset = await MeetingDataset.findOne();
+
+    res.status(200).json({success: true, meetingDataset: meetingDataset});
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+export const getDomainDataset = async (req, res) => {
+  try {
+    const domainDataset = await DomainDataset.findOne();
+
+    res.status(200).json({success: true, meetingDataset: domainDataset});
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+
+export const addDomainMember = async (req, res) => {
+  try {
+    const {domain, memberName, year} = req.body;
+
+    const domainDataset = await DomainDataset.findOne().sort({_id: -1});
+
+    domainDataset[domain].push({memberName, year});
+    await domainDataset.save();
+    res.status(200).json({
+      success: true,
+      message: 'Member added to meeting dataset.',
+      data: domainDataset[domain],
+    });
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+
+export const editMeeting = async (req, res) => {
+  try {
+    const {
+      selectedDataset,
+      selectedMeetingIndex,
+      updatedData,
+      editedMemberIndex,
+    } = req.body;
+
+    const meetingDataset = await MeetingDataset.findOne();
+
+    console.log(meetingDataset[selectedDataset][selectedMeetingIndex]);
+
+    meetingDataset[selectedDataset][selectedMeetingIndex]['members'][
+      editedMemberIndex
+    ] = updatedData;
+    await meetingDataset.save();
+    res.status(200).json({
+      success: true,
+      message: 'Meeting data edited.',
+      data: meetingDataset[selectedDataset][selectedMeetingIndex],
+    });
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+export const addMeeting = async (req, res) => {
+  try {
+    const {domain, meeting} = req.body;
+
+    const meetingDataset = await MeetingDataset.findOne().sort({_id: -1});
+
+    meetingDataset[domain].push(meeting);
+    await meetingDataset.save();
+    res.status(200).json({
+      success: true,
+      message: 'Meeting added to meeting dataset.',
+      data: meetingDataset[domain],
+    });
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+export const ShiftMember = async (req, res) => {
+  try {
+    const {currentDomain, newDomain, memberIndex} = req.body;
+    const domainDataset = await DomainDataset.findOne().sort({_id: -1});
+
+    const memberToShift = domainDataset[currentDomain][memberIndex];
+    domainDataset[currentDomain].splice(memberIndex, 1);
+    domainDataset[newDomain].push(memberToShift);
+    await domainDataset.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Member shifted to another domain.',
+      data: domainDataset,
+    });
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+
+export const DeleteMember = async (req, res) => {
+  try {
+    const {domain, memberIndex} = req.body;
+    const domainDataset = await DomainDataset.findOne().sort({_id: -1});
+
+    domainDataset[currentDomain].splice(memberIndex, 1);
+    await domainDataset.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Member Deleted.',
+      data: domainDataset,
+    });
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+
+export const resetDomainDataset = async (req, res) => {
+  try {
+    const dataToInsert = initialDomainDatasets;
+    const domainDataset = new DomainDataset(dataToInsert);
+
+    domainDataset.save();
+    res
+      .status(200)
+      .json({success: true, message: 'Data inserted/reset successfully.'});
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
+  }
+};
+
+export const resetMeetingDataset = async (req, res) => {
+  try {
+    const dataToInsert = initialDatasets;
+    const domainDataset = new MeetingDataset(dataToInsert);
+
+    domainDataset.save();
+    res.status(200).json({
+      success: true,
+      message: 'Meeting Data inserted/ reset successfully.',
+    });
+  } catch (error) {
+    res.status(500).json({success: false, message: error.message});
   }
 };

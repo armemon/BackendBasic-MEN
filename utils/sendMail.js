@@ -13,7 +13,7 @@ export const sendMail = async (email, subject, text) => {
 
   await transport.sendMail({
     from: process.env.SMTP_USER,
-    to: email,
+    to: process.env.SMTP_USER,
     subject,
     text, 
   });
