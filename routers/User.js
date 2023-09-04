@@ -53,10 +53,10 @@ router.route('/getDomainDataset').get(isAuthenticated, getDomainDataset);
 router.route('/getMeetingDataset').get(isAuthenticated, getMeetingDataset);
 
 router.route('/addDomainMember').post(isAuthenticated, addDomainMember);
-router.route('/editMeeting').post(isAuthenticated, editMeeting);
+router.route('/editMeeting').put(isAuthenticated, editMeeting);
 router.route('/addMeeting').post(isAuthenticated, addMeeting);
-router.route('/ShiftMember').post(isAuthenticated, ShiftMember);
-router.route('/DeleteMember').post(isAuthenticated, DeleteMember);
+router.route('/ShiftMember').put(isAuthenticated, ShiftMember);
+router.route('/DeleteMember').delete(isAuthenticated, DeleteMember);
 
 router.route('/resetDomainDataset').get(isAuthenticated, resetDomainDataset);
 router.route('/resetMeetingDataset').get(isAuthenticated, resetMeetingDataset);
