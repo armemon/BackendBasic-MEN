@@ -327,7 +327,7 @@ export const getMeetingDataset = async (req, res) => {
 
     const meetingDataset = await MeetingDataset.findOne().sort({_id: -1});
 
-    res.status(200).json({success: true, meetingDataset: meetingDataset});
+    res.status(200).json({success: true, message:"Meeting Dataset Loaded", meetingDataset: meetingDataset});
   } catch (error) {
     res.status(500).json({success: false, message: error.message});
   }
@@ -336,7 +336,7 @@ export const getDomainDataset = async (req, res) => {
   try {
     const domainDataset = await DomainDataset.findOne().sort({_id: -1});
 
-    res.status(200).json({success: true, domainDataset: domainDataset});
+    res.status(200).json({success: true,message:"Domain Dataset Loaded", domainDataset: domainDataset});
   } catch (error) {
     res.status(500).json({success: false, message: error.message});
   }
@@ -428,7 +428,7 @@ export const DeleteMember = async (req, res) => {
     const {domain, memberIndex} = req.body;
     const domainDataset = await DomainDataset.findOne().sort({_id: -1});
 
-    domainDataset[currentDomain].splice(memberIndex, 1);
+    domainDataset[domain].splice(memberIndex, 1);
     await domainDataset.save();
 
     res.status(200).json({
