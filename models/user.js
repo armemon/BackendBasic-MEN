@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  position: {
+    type: String,
+  },
   avatar: {
     public_id: String,
     url: String,
