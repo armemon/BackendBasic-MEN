@@ -405,13 +405,12 @@ export const addMeeting = async (req, res) => {
 };
 export const ShiftMember = async (req, res) => {
   try {
-    const {currentDomain, newDomain, memberId } = req.body;
+    const {currentDomain, newDomain, memberIndex} = req.body;
     const domainDataset = await DomainDataset.findOne().sort({_id: -1});
 
-    const memberToShift = domainDataset.members.id(memberId);
-    memberToShift.remove();
-    domainDataset.members.push(memberToShift);
-
+    const memberToShift = domainDataset[currentDomain][memberIndex];
+    domainDataset[currentDomain].splice(memberIndex, 1);
+    domainDataset[newDomain].push(memberToShift);
     await domainDataset.save();
 
     res.status(200).json({
@@ -426,11 +425,10 @@ export const ShiftMember = async (req, res) => {
 
 export const DeleteMember = async (req, res) => {
   try {
-    const {domain, memberId } = req.body;
+    const {domain, memberIndex} = req.body;
     const domainDataset = await DomainDataset.findOne().sort({_id: -1});
 
-    const memberToDelete = domainDataset.members.id(memberId);
-    memberToDelete.remove();
+    domainDataset[domain].splice(memberIndex, 1);
     await domainDataset.save();
 
     res.status(200).json({
