@@ -405,12 +405,29 @@ export const addMeeting = async (req, res) => {
 };
 export const ShiftMember = async (req, res) => {
   try {
-    const {currentDomain, newDomain, memberIndex} = req.body;
-    const domainDataset = await DomainDataset.findOne().sort({_id: -1});
+    const {currentDomain, newDomain, id} = req.body;
+    const domainDataset = await DomainDataset.findOne().sort({ _id: -1 });
+    
+    const memberToShift = domainDataset[currentDomain].find(
+      (member) => member._id.toString() === id.toString()
+    );
 
-    const memberToShift = domainDataset[currentDomain][memberIndex];
-    domainDataset[currentDomain].splice(memberIndex, 1);
+    if (!memberToShift) {
+      return res.status(404).json({
+        success: false,
+        message: 'Member not found in the current domain.',
+      });
+    }
+
+    // Remove the member from the current domain in memory
+    domainDataset[currentDomain] = domainDataset[currentDomain].filter(
+      (member) => member._id.toString() !== id.toString()
+    );
+
+    // Add the member to the new domain
     domainDataset[newDomain].push(memberToShift);
+
+    // Save the updated domain dataset to the database
     await domainDataset.save();
 
     res.status(200).json({
@@ -425,10 +442,12 @@ export const ShiftMember = async (req, res) => {
 
 export const DeleteMember = async (req, res) => {
   try {
-    const {domain, memberIndex} = req.body;
+    const {domain, id} = req.body;
     const domainDataset = await DomainDataset.findOne().sort({_id: -1});
 
-    domainDataset[domain].splice(memberIndex, 1);
+    domainDataset[domain] =  domainDataset[domain].filter(
+      (member) => member._id.toString() !== id.toString()
+    );
     await domainDataset.save();
 
     res.status(200).json({
