@@ -15,6 +15,8 @@ export const sendToken = (res, user, statusCode, message) => {
       avatar: user.avatar,
       tasks: user.tasks,
       verified: user.verified,
+      domain: user.domain,
+      position: user.position
     };
   
     res
