@@ -363,16 +363,14 @@ export const addDomainMember = async (req, res) => {
 export const editMeeting = async (req, res) => {
   try {
     const {
-      selectedDataset,
-      selectedMeetingIndex,
-      updatedData,
-      editedMemberIndex,
+      selectedDataset, selectedMeetingID, editedMemberID, updatedData
     } = req.body;
 
     const meetingDataset = await MeetingDataset.findOne().sort({_id: -1});
 
     console.log(meetingDataset[selectedDataset][selectedMeetingIndex]);
-
+    const selectedMeetingIndex = meetingDataset[selectedDataset].findIndex( (meeting) => meeting._id.toString() === selectedMeetingID.toString())
+    const editedMemberIndex = meetingDataset[selectedDataset][selectedMeetingIndex]['members'].findIndex( (member) => member._id.toString() === editedMemberID.toString())
     meetingDataset[selectedDataset][selectedMeetingIndex]['members'][
       editedMemberIndex
     ] = updatedData;
