@@ -36,7 +36,7 @@ export const register = async (req, res) => {
       mycloud = await cloudinary.uploader.upload(avatar, {
         folder: 'IEEEPES',
       });
-      console.log(mycloud);
+      // console.log(mycloud);
       fs.rmSync('./tmp', {recursive: true});
     }
     user = await User.create({
@@ -69,7 +69,7 @@ export const register = async (req, res) => {
 export const verify = async (req, res) => {
   try {
     const otp = Number(req.body.otp);
-    const user = await User.findOne(req.user._otp); //Solve
+    const user = await User.findById(req.user._id); //Solve
     if (user.otp !== otp || user.otp_expiry < Date.now()) {
       return res
         .status(400)
@@ -91,7 +91,7 @@ export const verify = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const {email, password} = req.body;
-    console.log(email, password);
+    // console.log(email, password);
 
     if (!email || !password) {
       return res
@@ -214,7 +214,7 @@ export const updateProfile = async (req, res) => {
 
     if (name) user.name = name;
     if (avatar) {
-      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+      await cloudinary.uploader.destroy(user.avatar.public_id);
 
       const mycloud = await cloudinary.uploader.upload(avatar, {
         folder: 'IEEEPES',
@@ -370,7 +370,7 @@ export const editMeeting = async (req, res) => {
 
     const meetingDataset = await MeetingDataset.findOne().sort({_id: -1});
 
-    console.log(meetingDataset[selectedDataset][selectedMeetingIndex]);
+    // console.log(meetingDataset[selectedDataset][selectedMeetingIndex]);
     const selectedMeetingIndex = meetingDataset[selectedDataset].findIndex( (meeting) => meeting._id.toString() === selectedMeetingID.toString())
     const editedMemberIndex = meetingDataset[selectedDataset][selectedMeetingIndex]['members'].findIndex( (member) => member._id.toString() === editedMemberID.toString())
     meetingDataset[selectedDataset][selectedMeetingIndex]['members'][
