@@ -1,0 +1,7 @@
+Package.json
+-type from commonjs to module... to use ES6 import export command
+--// const express = require('express');
+--import express from 'express';
+
+--export const User = mongoose.model('User', userSchema);
+--module.exports = Dataset;
